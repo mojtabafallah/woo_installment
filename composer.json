@@ -1,0 +1,9 @@
+{
+    "name": "mojtaba/mjt_woo_installment",
+    "autoload": {
+        "psr-4": {
+            "src\\": "src/"
+        }
+    },
+    "require": {}
+}
