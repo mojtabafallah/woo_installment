@@ -17,6 +17,7 @@ require_once "vendor/autoload.php";
 class mjt_woo_installment {
 	public function __construct() {
 		Init::init_menus();
+		Init::init_db();
 	}
 }
 
