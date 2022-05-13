@@ -15,86 +15,68 @@ class Installment extends Model {
 		"count_bank_note"      => [ "int", "number" ],
 		"title"                => [ "varchar(255)", "text" ],
 		"description"          => [ "text", "textarea" ],
-		"deleted"              => [ "boolean", "checkbox" ]
+		"deleted_item"         => [ "varchar(255)", "checkbox" ]
 	);
 
-	public function generate_fields( $true = true ) {
+	public function generate_fields( $edit = false ) {
+		/**
+		 * if edit create field id hidden
+		 */
+		if ( $edit ) {
+			$installment = new Installment();
+			if ( isset( $_GET['row_id'] ) && intval( $_GET['row_id'] ) > 0 ) {
+				echo "<input type='hidden' name='id' value='{$_GET['row_id']}'>";
+				$installment_item = $installment->find( $_GET['row_id'] );
+			}
+		}
 		$fields = $this->columns;
 		foreach ( $fields as $name => $type ) {
-			switch ( $type[1] ) {
-				case "number":
-					?>
-                    <tr valign="top">
-                        <th scope="row">
-							<?php echo $name ?>
-                        </th>
-                        <td>
-							<?php echo "<input type='number' name='$name' id='$name'>"; ?>
-                        </td>
-                    </tr>
-					<?php
 
+			$value = $edit ? $installment_item->$name : "";
+			?>
+            <tr valign="top">
+                <th scope="row">
+					<?php echo $name ?>
+                </th>
+                <td>
+					<?php
+					switch ( $type[1] ) {
+						case "number":
+							echo "<input type='number' name='$name' id='$name' value='$value' >";
+							break;
+						case "text":
+							echo "<input type='text' name='$name' id='$name' value='$value'>";
+							break;
+						case "textarea":
+							echo "<textarea name='$name' id='$name'>$value</textarea>";
 
-					break;
-				case "text":
-					?>
-                    <tr valign="top">
-                        <th scope="row">
-							<?php echo $name ?>
-                        </th>
-                        <td>
-							<?php echo "<input type='text' name='$name' id='$name'>"; ?>
-                        </td>
-                    </tr>
-					<?php
-					break;
-				case "textarea":
-					?>
-                    <tr valign="top">
-                        <th scope="row">
-							<?php echo $name ?>
-                        </th>
-                        <td>
-							<?php echo "<textarea name='$name' id='$name'></textarea>"; ?>
-                        </td>
-                    </tr>
-					<?php
+							break;
+						case "checkbox":
+							if ( $name == $value ) {
+								$check = "checked";
+							} else {
+								$check = "";
+							}
+							echo "<input type='checkbox' name='$name' id='$name' value='$name' $check >";
+							break;
+						case "select":
+							?>
 
-					break;
-				case "checkbox":
-					?>
-                    <tr valign="top">
-                        <th scope="row">
-							<?php echo $name ?>
-                        </th>
-                        <td>
-							<?php echo "<input type='checkbox' name='$name' id='$name'>"; ?>
-                        </td>
-                    </tr>
-					<?php
-					break;
-				case "select":
-					?>
-                    <tr valign="top">
-                        <th scope="row">
-							<?php echo $name ?>
-                        </th>
-                        <td>
                             <select name="<?php echo $name ?>" id="<?php echo $name ?>">
 								<?php $options = $type[2];
 								foreach ( $options as $option ):
 									?>
-                                    <option value="<?php echo $option ?>"><?php echo $option ?></option>
+                                    <option value="<?php echo $option ?>" <?php if ( $value == $option )
+										echo 'selected' ?>><?php echo $option ?></option>
 								<?php endforeach; ?>
-
                             </select>
-
-                        </td>
-                    </tr>
-					<?php
-					break;
-
-			}
+							<?php
+							break;
+					}
+					?>
+                </td>
+            </tr>
+			<?php
 
 		}
 	}

@@ -9,6 +9,7 @@ Author URI: https://github.com/mojtabafallah13/
 */
 
 
+use src\controllers\installmentController;
 use src\core\Init;
 
 require_once "constants.php";
@@ -18,9 +19,95 @@ class mjt_woo_installment {
 	public function __construct() {
 		Init::init_menus();
 		Init::init_db();
+		Init::metaboxes();
+		Init::bootstrap();
+
+
 	}
 }
 
 new mjt_woo_installment();
 
 
+function calculate_embossing_fee( $cart_object ) {
+	if ( ! WC()->session->__isset( "reload_checkout" ) ) {
+		foreach ( $cart_object->cart_contents as $key => $value ) {
+			/**
+			 * get installment product
+			 */
+			$product_id       = $value['product_id'];
+			$installment_data = installmentController::get_data_price_installment( $product_id );
+			$value['data']->set_price( $installment_data['init_price'] );
+		}
+	}
+}
+
+add_action( 'woocommerce_before_calculate_totals', 'calculate_embossing_fee', 99 );
+
+/**
+ * save order
+ */
+add_action( 'woocommerce_thankyou', 'so_payment_complete' );
+function so_payment_complete( $order_id ) {
+	$order = wc_get_order( $order_id );
+	var_dump( $order );
+}
+
+/**
+ * add tab to my account
+ */
+
+
+/**
+ * 1. Register new endpoint slug to use for My Account page
+ */
+
+/**
+ * @important-note    Resave Permalinks or it will give 404 error
+ */
+function ts_custom_add_premium_support_endpoint() {
+	add_rewrite_endpoint( 'premium-support', EP_ROOT | EP_PAGES );
+}
+
+add_action( 'init', 'ts_custom_add_premium_support_endpoint' );
+
+
+/**
+ * 2. Add new query var
+ */
+
+function ts_custom_premium_support_query_vars( $vars ) {
+	$vars[] = 'installment-manage';
+
+	return $vars;
+}
+
+add_filter( 'woocommerce_get_query_vars', 'ts_custom_premium_support_query_vars', 0 );
+
+
+/**
+ * 3. Insert the new endpoint into the My Account menu
+ */
+
+function ts_custom_add_premium_support_link_my_account( $items ) {
+	$items['installment-manage'] = __( "Installment Manage", MJT_WOO_INS_TRANSLATE_KEY );
+
+	return $items;
+}
+
+add_filter( 'woocommerce_account_menu_items', 'ts_custom_add_premium_support_link_my_account' );
+
+
+/**
+ * 4. Add content to the new endpoint
+ */
+
+function ts_custom_premium_support_content() {
+
+	require_once MJT_WOO_INS_DIR_PLUGIN . "src/views/front/tab_installment_manage.php";
+}
+
+/**
+ * @important-note    "add_action" must follow 'woocommerce_account_{your-endpoint-slug}_endpoint' format
+ */
+add_action( 'woocommerce_account_premium-support_endpoint', 'ts_custom_premium_support_content' );

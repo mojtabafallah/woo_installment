@@ -11,12 +11,18 @@
 			$installment = new Installment();
 			isset( $_GET['action'] ) && $_GET['action'] == "edit" ?
 				$installment->generate_fields( true ) :
-				$installment->generate_fields(  )  ?>
+				$installment->generate_fields() ?>
             <tr valign="top">
                 <th scope="row">
                 </th>
                 <td>
-                    <input class="button button-primary" name="submit_add" value="add" type="submit">
+                    <input class="button button-primary" name="<?php echo
+					isset( $_GET['action'] ) && $_GET['action'] == "edit" ?
+						"submit_edit" :
+						"submit_add" ?>" value="<?php echo
+                    isset( $_GET['action'] ) && $_GET['action'] == "edit" ?
+	                    "Edit" :
+	                    "Add" ?>" type="submit">
                 </td>
             </tr>
             </tbody>

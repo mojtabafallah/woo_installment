@@ -22,6 +22,10 @@
             <th>
 				<?php _e( "Title" ); ?>
             </th>
+
+            <th>
+		        <?php _e( "Deleted" ); ?>
+            </th>
             <th>
 				<?php _e( "Actions" ); ?>
             </th>
@@ -30,27 +34,40 @@
         </thead>
         <tbody>
 		<?php
-		foreach ( $all_data_model as $category ):?>
+		foreach ( $all_data_model as $installment ):?>
             <tr>
                 <td>
-					<?php echo $category->id ?>
+					<?php echo $installment->id ?>
                 </td>
                 <td>
-					<?php echo $category->title ?>
+					<?php echo $installment->pay_type ?>
+                </td>
+                <td>
+					<?php echo $installment->online_pay ?>
+                </td>
+                <td>
+					<?php echo $installment->percentage_bank_note ?>
+                </td>
+                <td>
+					<?php echo $installment->count_bank_note ?>
+                </td>
+                <td>
+					<?php echo $installment->title ?>
+                </td>
+                <td>
+	                <?php echo $installment->deleted_item ?>
                 </td>
                 <td>
                     <a href="<?php echo add_query_arg( [
-						'item'   => Category::$item,
 						'action' => 'edit',
-						'id_row' => $category->id
+						'row_id' => $installment->id
 					] ) ?>">
 						<?php _e( "Edit" ); ?>
                     </a>
-                    <a onclick='return confirm("<?php _e( 'you want to delete?', "kias_zephyr" ); ?>")'
+                    <a onclick='return confirm("<?php _e( 'you want to delete?', MJT_WOO_INS_TRANSLATE_KEY ); ?>")'
                        href="<?php echo add_query_arg( [
-						   'item'   => Category::$item,
 						   'action' => "delete",
-						   'id_row' => $category->id
+						   'row_id' => $installment->id
 					   ] ) ?>">
 						<?php _e( "Delete" ); ?>
                     </a>
