@@ -1,5 +1,5 @@
 <div class="wrap">
-    <h1><?php _e( "Pivots issues", MJT_WOO_INS_TRANSLATE_KEY ); ?></h1>
+    <h1><?php _e( "لیست پنل اقساطی", MJT_WOO_INS_TRANSLATE_KEY ); ?></h1>
     <table class="widefat">
         <thead>
         <tr>

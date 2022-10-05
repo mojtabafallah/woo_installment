@@ -132,7 +132,15 @@ class installmentController {
 		if ( $installment_item->pay_type == "price" ) {
 			$init_price = $installment_item->online_pay;
 		} elseif ( $installment_item->pay_type == "percent" ) {
-			$init_price = ( $product_item->get_price() * ( $installment_item->online_pay / 100 ) );
+
+			if ( $product_item->get_price() ) {
+
+				$init_price = ( $product_item->get_price() * ( $installment_item->online_pay / 100 ) );
+			} else {
+				$init_price = 0;
+			}
+		} elseif ( $installment_item->pay_type == "third" ) {
+			$init_price = $product_item->get_price() / 3;
 		}
 		/**
 		 * count promissory
@@ -142,20 +150,28 @@ class installmentController {
 		/**
 		 * price promissory
 		 */
-		$percent_note     = $installment_item->percentage_bank_note;
-		$promissory_price = ( $product_item->get_price() - $init_price ) * ( ( $percent_note / 100 ) );
+		$percent_note = $installment_item->percentage_bank_note;
+		if ( $product_item->get_price() ) {
+			$promissory_price = ( $product_item->get_price() - $init_price ) * ( ( $percent_note / 100 ) );
+		} else {
+			$promissory_price = 0;
+		}
 
 		/**
 		 * total price
 		 */
-		$total_price = $product_item->get_price() + $promissory_price;
+		if ( $product_item->get_price() ) {
+			$total_price = $product_item->get_price() + $promissory_price;
+		} else {
+			$total_price = 0;
+		}
 
 		return array(
 			"init_price"       => $init_price,
 			"count_promissory" => $count_promissory,
 			"percent_note"     => $percent_note,
 			"promissory_price" => $promissory_price,
-			"total_price"            => $total_price
+			"total_price"      => $total_price
 		);
 
 

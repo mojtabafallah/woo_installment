@@ -1,9 +1,12 @@
+
+
 <table>
+
     <tr>
-        <th><?php _e( "Initial payment", MJT_WOO_INS_TRANSLATE_KEY ) ?></th>
-        <th><?php _e( "Excess promissory note price", MJT_WOO_INS_TRANSLATE_KEY ) ?></th>
-        <th><?php _e( "Count promissory note", MJT_WOO_INS_TRANSLATE_KEY ) ?></th>
-        <th><?php _e( "Total Price", MJT_WOO_INS_TRANSLATE_KEY ) ?></th>
+        <th>پرداخت اولیه</th>
+        <th> مبلغ افزوده برای چک</th>
+        <th> تعداد چک</th>
+        <th>مبلغ کل</th>
     </tr>
     <tr>
         <td><?php echo wc_price( $price_data['init_price'] ); ?></td>

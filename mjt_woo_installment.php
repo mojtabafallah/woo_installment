@@ -30,16 +30,25 @@ new mjt_woo_installment();
 
 
 function calculate_embossing_fee( $cart_object ) {
-	if ( ! WC()->session->__isset( "reload_checkout" ) ) {
-		foreach ( $cart_object->cart_contents as $key => $value ) {
-			/**
-			 * get installment product
-			 */
-			$product_id       = $value['product_id'];
-			$installment_data = installmentController::get_data_price_installment( $product_id );
-			$value['data']->set_price( $installment_data['init_price'] );
+	foreach ( $cart_object->cart_contents as $item ) {
+		if ( isset( $item['type_sell']['key'] ) ) {
+			if ( $item['type_sell']['key'] == "installment" ) {
+
+				if ( ! WC()->session->__isset( "reload_checkout" ) ) {
+					/**
+					 * get installment product
+					 */
+					$product_id       = $item['product_id'];
+					$installment_data = installmentController::get_data_price_installment( $product_id );
+					$item['data']->set_price( $installment_data['init_price'] );
+				}
+			}
 		}
+
+
 	}
+
+
 }
 
 add_action( 'woocommerce_before_calculate_totals', 'calculate_embossing_fee', 99 );
@@ -50,7 +59,7 @@ add_action( 'woocommerce_before_calculate_totals', 'calculate_embossing_fee', 99
 add_action( 'woocommerce_thankyou', 'so_payment_complete' );
 function so_payment_complete( $order_id ) {
 	$order = wc_get_order( $order_id );
-	var_dump( $order );
+	//var_dump( $order );
 }
 
 /**
@@ -66,7 +75,7 @@ function so_payment_complete( $order_id ) {
  * @important-note    Resave Permalinks or it will give 404 error
  */
 function ts_custom_add_premium_support_endpoint() {
-	add_rewrite_endpoint( 'premium-support', EP_ROOT | EP_PAGES );
+	add_rewrite_endpoint( 'installment-manage', EP_ROOT | EP_PAGES );
 }
 
 add_action( 'init', 'ts_custom_add_premium_support_endpoint' );
@@ -110,4 +119,83 @@ function ts_custom_premium_support_content() {
 /**
  * @important-note    "add_action" must follow 'woocommerce_account_{your-endpoint-slug}_endpoint' format
  */
-add_action( 'woocommerce_account_premium-support_endpoint', 'ts_custom_premium_support_content' );
+add_action( 'woocommerce_account_installment-manage_endpoint', 'ts_custom_premium_support_content' );
+
+
+function mjt_enqueue_admin_script( $hook ) {
+
+	wp_enqueue_script( 'mjt_script_admin', MJT_WOO_INS_URL_PLUGIN . '/assets/admin/js/script-admin.js', array( "jquery" ), '1.0' );
+}
+
+add_action( 'admin_enqueue_scripts', 'mjt_enqueue_admin_script' );
+
+function output_add_to_cart_custom_fields() {
+	?>
+    <div>
+
+        <label>
+            فروش نقدی
+            <input type="radio" name="type_sell" value="normal" checked>
+        </label>
+        <label>
+            فروش اقساطی
+            <input type="radio" name="type_sell" value="installment">
+        </label>
+
+    </div>
+	<?php
+}
+
+add_action( 'woocommerce_before_add_to_cart_button', 'output_add_to_cart_custom_fields', 10 );
+
+
+// Add data to cart item
+add_filter( 'woocommerce_add_cart_item_data', 'add_cart_item_data', 25, 2 );
+function add_cart_item_data( $cart_item_data, $product_id ) {
+	if ( ! isset( $_POST['type_sell'] ) ) {
+
+		return $cart_item_data;
+	}
+
+	// Add the data to session and generate a unique ID
+	if ( $_POST['type_sell'] == "installment" ) {
+		$cart_item_data['type_sell']['key'] = "installment";
+
+	} else {
+		$cart_item_data['type_sell']['key'] = "normal";
+	}
+
+	return $cart_item_data;
+}
+
+
+// Display custom data on cart and checkout page.
+add_filter( 'woocommerce_get_item_data', 'get_item_data', 25, 2 );
+function get_item_data( $cart_data, $cart_item ) {
+
+
+	if ( ! empty( $cart_item['type_sell']['key'] ) ) {
+
+		if ( $cart_item['type_sell']['key'] == "installment" ) {
+			$key = "قسطی";
+		} else {
+			$key = "نقدی";
+		}
+
+		$cart_data[] = array(
+			'name'    => "نوع فروش",
+			'display' => $key
+		);
+	}
+
+	return $cart_data;
+}
+
+// Add order item meta.
+add_action( 'woocommerce_add_order_item_meta', 'add_order_item_meta', 10, 3 );
+function add_order_item_meta( $item_id, $cart_item, $cart_item_key ) {
+	if ( isset( $cart_item['type_sell'] ) ) {
+		$values = $cart_item['type_sell']['key'];
+		wc_add_order_item_meta( $item_id, __( "Option", "aoim" ), $values );
+	}
+}

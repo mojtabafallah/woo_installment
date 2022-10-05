@@ -9,7 +9,7 @@ class Installment extends Model {
 
 	public $table_name = "installment";
 	public $columns = array(
-		"pay_type"             => [ "varchar(255)", "select", [ "percent", "price" ] ],
+		"pay_type"             => [ "varchar(255)", "select", [ "percent", "price", "third" ] ],
 		"online_pay"           => [ "int", "number" ],
 		"percentage_bank_note" => [ "int", "number" ],
 		"count_bank_note"      => [ "int", "number" ],

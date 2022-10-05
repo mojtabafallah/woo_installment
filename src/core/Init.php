@@ -4,16 +4,22 @@
 namespace src\core;
 
 
+use src\controllers\fileController;
 use src\controllers\installmentController;
 
 
 class Init {
 	public static function init_menus() {
 		installmentController::create_menu();
+
+		new Menu("اطلاعات فروش اقساطی","اطلاعات فروش اقساطی",
+		"info_installment","info_installment");
+
 	}
 
 	public static function init_db() {
 		installmentController::create_table();
+		fileController::create_table();
 	}
 
 	public static function metaboxes() {
